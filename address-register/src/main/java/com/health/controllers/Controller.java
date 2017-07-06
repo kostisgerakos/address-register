@@ -1,16 +1,19 @@
-package health.controllers;
+package com.health.controllers;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.Properties;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import health.model.Service;
+import com.health.model.Service;
 
 @RestController
 public class Controller {
@@ -48,17 +51,41 @@ public class Controller {
 			exception.printStackTrace();
 
 		}*/
-
-		try {
+		//kg tried to locate network address but with many interfaces is not secured
+		/*try {
 			serv.setAddress(getLocalHostLANAddress().getHostAddress());
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		serv.setPort("1883");
+		}*/
+		Properties prop = new Properties();
+    	InputStream input = null;
+
+    	try {
+
+    		String filename = "application.properties";
+    		input = Controller.class.getClassLoader().getResourceAsStream(filename);
+    		//if(input==null){
+    	    //        System.out.println("Sorry, unable to find " + filename);
+    		    //return;
+    		//}
+
+    		//load a properties file from class path, inside static method
+    		prop.load(input);
+
+
+    	} catch (IOException ex) {
+    		ex.printStackTrace();
+        } 
+		
+		serv.setAddress(prop.getProperty("mqtt.url"));
+
+		serv.setPort(prop.getProperty("mqtt.port"));
 
 		return serv;
 	}
+	
+	//kg tried to locate network address but with many interfaces is not secured
 	private static InetAddress getLocalHostLANAddress() throws UnknownHostException {
 	    try {
 	        InetAddress candidateAddress = null;

@@ -1,4 +1,4 @@
-package health.model;
+package com.health.model;
 
 public class Service {
 
